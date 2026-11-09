@@ -20,7 +20,8 @@ import jakarta.persistence.PreUpdate;
 import jakarta.persistence.Table;
 
 @Entity
-@Table(name = "waiting_queues")
+@Table(name = "waiting_queues", uniqueConstraints = @jakarta.persistence.UniqueConstraint(
+        name = "uk_waiting_queue_order", columnNames = {"room_id", "start_at", "queue_order"}))
 public class WaitingQueue {
 
     @Id

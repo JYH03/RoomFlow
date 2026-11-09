@@ -18,6 +18,10 @@ repositories {
 }
 
 dependencies {
+	implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:3.1.1'
+	testRuntimeOnly 'com.h2database:h2'
+	implementation 'org.springframework.boot:spring-boot-starter-security'
+	implementation 'org.springframework.boot:spring-boot-starter-security-oauth2-resource-server'
 	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
 	implementation 'org.springframework.boot:spring-boot-starter-validation'
 	implementation 'org.springframework.boot:spring-boot-starter-webmvc'
@@ -27,8 +31,30 @@ dependencies {
 	testImplementation 'org.springframework.boot:spring-boot-starter-validation-test'
 	testImplementation 'org.springframework.boot:spring-boot-starter-webmvc-test'
 	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+	testImplementation 'org.springframework.security:spring-security-test'
 }
 
 tasks.named('test') {
 	useJUnitPlatform()
+}
+
+// Local credentials must never be bundled in either JAR.
+tasks.named('processResources') {
+    exclude 'application-local.properties'
+}
+
+tasks.named('bootRun') {
+    systemProperty 'user.timezone', 'Asia/Seoul'
+}
+
+tasks.register('mysqlTest', Test) {
+    description = 'Runs workflow/concurrency tests in a disposable MySQL database.'
+    group = 'verification'
+    testClassesDirs = sourceSets.test.output.classesDirs
+    classpath = sourceSets.test.runtimeClasspath
+    useJUnitPlatform()
+    filter { includeTestsMatching 'com.jyh03.roomflow.integration.WorkflowIntegrationTests' }
+    systemProperty 'roomflow.test.mysql', 'true'
+    outputs.upToDateWhen { false }
+    shouldRunAfter tasks.test
 }

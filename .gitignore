@@ -37,3 +37,8 @@ out/
 .vscode/
 
 /src/main/resources/application-local.properties
+/application-local.properties
+/.env
+
+# Local study notes
+/knowledge/

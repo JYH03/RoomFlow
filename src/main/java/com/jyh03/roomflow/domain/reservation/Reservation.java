@@ -86,12 +86,49 @@ public class Reservation {
     }
 
     public void checkIn() {
+        checkIn(LocalDateTime.now());
+    }
+
+    public void checkIn(LocalDateTime now) {
+        if (status != ReservationStatus.CONFIRMED || checkedInAt != null) {
+            throw new IllegalArgumentException("확정된 미입실 예약만 체크인할 수 있습니다.");
+        }
+        if (now.isBefore(startAt)) {
+            throw new IllegalArgumentException("예약 시작 시각부터 체크인할 수 있습니다.");
+        }
+        if (!now.isBefore(getCheckInDeadline())) {
+            throw new IllegalArgumentException("체크인 가능 시간이 지났습니다.");
+        }
         this.status = ReservationStatus.CHECKED_IN;
-        this.checkedInAt = LocalDateTime.now();
+        this.checkedInAt = now;
+    }
+
+    public LocalDateTime getCheckInDeadline() {
+        // Late promotion receives its own grace period without extending the slot.
+        LocalDateTime base = createdAt != null && createdAt.isAfter(startAt) ? createdAt : startAt;
+        LocalDateTime deadline = base.plusMinutes(5);
+        return deadline.isBefore(endAt) ? deadline : endAt;
+    }
+
+    public boolean markNoShow(LocalDateTime now) {
+        if (status != ReservationStatus.CONFIRMED || checkedInAt != null
+                || now.isBefore(getCheckInDeadline())) {
+            return false;
+        }
+        this.status = ReservationStatus.NO_SHOW;
+        return true;
     }
 
     public Long getId() {
         return id;
+    }
+
+    public boolean complete(LocalDateTime now) {
+        if (status != ReservationStatus.CHECKED_IN || now.isBefore(endAt)) {
+            return false;
+        }
+        status = ReservationStatus.COMPLETED;
+        return true;
     }
 
     public User getUser() {

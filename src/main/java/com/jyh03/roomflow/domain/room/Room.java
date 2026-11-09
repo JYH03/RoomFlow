@@ -2,8 +2,6 @@ package com.jyh03.roomflow.domain.room;
 
 import java.time.LocalDateTime;
 
-import javax.annotation.processing.Generated;
-
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;

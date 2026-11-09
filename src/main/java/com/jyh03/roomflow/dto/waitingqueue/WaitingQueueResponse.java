@@ -12,9 +12,14 @@ public record WaitingQueueResponse(
         LocalDateTime startAt,
         LocalDateTime endAt,
         Integer queueOrder,
-        WaitingQueueStatus status) {
+        WaitingQueueStatus status,
+        Long position) {
 
     public static WaitingQueueResponse from(WaitingQueue waitingQueue) {
+        return from(waitingQueue, null);
+    }
+
+    public static WaitingQueueResponse from(WaitingQueue waitingQueue, Long position) {
         return new WaitingQueueResponse(
                 waitingQueue.getId(),
                 waitingQueue.getUser().getId(),
@@ -22,6 +27,6 @@ public record WaitingQueueResponse(
                 waitingQueue.getStartAt(),
                 waitingQueue.getEndAt(),
                 waitingQueue.getQueueOrder(),
-                waitingQueue.getStatus());
+                waitingQueue.getStatus(), position);
     }
 }
